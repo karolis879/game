@@ -11,10 +11,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['score2'] = 0;
         $_SESSION['turn'] = 1; // Kieno eilė pradžioje
 
+
+
         // Nukreipiame į žaidimo puslapį
         header("Location: game.php");
         exit();
     }
+}
+// Tikriname, ar buvo paspaustas mygtukas "mesti kauliuką"
+if (isset($_POST['rollDice'])) {
+    // Sugeneruojame skaičių nuo 1 iki 6
+    $diceValue = rand(1, 6);
+
+    // Pridedame rezultatą prie žaidėjo taškų
+    $_SESSION['score' . $_SESSION['turn']] += $diceValue;
+
+    // Pakeičiame žaidėjo eilę
+    $_SESSION['turn'] = $_SESSION['turn'] === 1 ? 2 : 1;
+
+    // Nukreipiame į žaidimo puslapį
+    header("Location: game.php");
+    exit();
+}
+
+if (isset($_POST['restart'])) {
+    session_unset();
+    session_destroy();
+
+    // Nukreipiame į pradinį puslapį
+    header("Location: game.php");
+    exit();
 }
 
 // Žaidimo puslapio HTML kodas
@@ -22,9 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Žaidimas</title>
 </head>
+
 <body>
     <?php if (!isset($_SESSION['player1']) || !isset($_SESSION['player2'])) : ?>
         <!-- Žaidėjų vardų įvedimo forma -->
@@ -56,23 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="submit" name="rollDice" value="Mesti kauliuką">
             </form>
 
-            <?php
-            // Tikriname, ar buvo paspaustas mygtukas "mesti kauliuką"
-            if (isset($_POST['rollDice'])) {
-                // Sugeneruojame skaičių nuo 1 iki 6
-                $diceValue = rand(1, 6);
-
-                // Pridedame rezultatą prie žaidėjo taškų
-                $_SESSION['score' . $_SESSION['turn']] += $diceValue;
-
-                // Pakeičiame žaidėjo eilę
-                $_SESSION['turn'] = $_SESSION['turn'] === 1 ? 2 : 1;
-
-                // Nukreipiame į žaidimo puslapį
-                header("Location: game.php");
-                exit();
-            }
-            ?>
         <?php else : ?>
             <!-- Žaidimas baigėsi, rodomas laimėtojo pranešimas -->
             <h2>Žaidimas baigėsi!</h2>
@@ -82,18 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="submit" name="restart" value="Pradėti iš naujo">
             </form>
 
-            <?php
-            // Tikriname, ar buvo paspaustas mygtukas "Pradėti iš naujo"
-            if (isset($_POST['restart'])) {
-                session_unset();
-                session_destroy();
-
-                // Nukreipiame į pradinį puslapį
-                header("Location: game.php");
-                exit();
-            }
-            ?>
         <?php endif; ?>
     <?php endif; ?>
 </body>
+
 </html>
